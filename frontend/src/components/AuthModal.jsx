@@ -56,7 +56,8 @@ const AuthModal = ({ isOpen, onClose }) => {
       onClose();
       navigate('/dashboard');
     } else {
-      toast.error("Registration failed. This email may already be registered.");
+      const currentError = useAuthStore.getState().error || "Network Error: Could not reach the server.";
+      toast.error(`Error: ${currentError}`);
       setStep(0);
     }
   };
