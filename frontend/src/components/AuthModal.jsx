@@ -29,7 +29,12 @@ const AuthModal = ({ isOpen, onClose }) => {
       if (success) {
         toast.success("Welcome back!");
         onClose();
-        navigate('/dashboard');
+        const currentUser = useAuthStore.getState().user;
+        if (currentUser?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } else {
       if (formData.role === 'instructor') {
@@ -50,6 +55,9 @@ const AuthModal = ({ isOpen, onClose }) => {
       toast.success("Account created successfully!");
       onClose();
       navigate('/dashboard');
+    } else {
+      toast.error("Registration failed. This email may already be registered.");
+      setStep(0);
     }
   };
 
@@ -266,26 +274,26 @@ const AuthModal = ({ isOpen, onClose }) => {
                   </p>
                   
                   {formData.selectedCourse === 'Premium' ? (
-                    <div className="space-y-4">
+                    <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); processPayment(); }}>
                       <div className="p-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5">
                         <div className="flex items-center gap-3 text-gray-500 mb-4">
                           <CreditCard className="w-5 h-5" />
                           <span className="text-sm">Mock Credit Card (Don't enter real data)</span>
                         </div>
-                        <input type="text" placeholder="0000 0000 0000 0000" className="w-full bg-white dark:bg-black/50 border border-gray-200 dark:border-white/10 rounded-lg py-2 px-3 text-gray-900 dark:text-white mb-3 outline-none" />
+                        <input type="text" required minLength="16" placeholder="0000 0000 0000 0000" className="w-full bg-white dark:bg-black/50 border border-gray-200 dark:border-white/10 rounded-lg py-2 px-3 text-gray-900 dark:text-white mb-3 outline-none" />
                         <div className="flex gap-3">
-                          <input type="text" placeholder="MM/YY" className="flex-1 bg-white dark:bg-black/50 border border-gray-200 dark:border-white/10 rounded-lg py-2 px-3 text-gray-900 dark:text-white outline-none" />
-                          <input type="text" placeholder="CVC" className="flex-1 bg-white dark:bg-black/50 border border-gray-200 dark:border-white/10 rounded-lg py-2 px-3 text-gray-900 dark:text-white outline-none" />
+                          <input type="text" required placeholder="MM/YY" className="flex-1 bg-white dark:bg-black/50 border border-gray-200 dark:border-white/10 rounded-lg py-2 px-3 text-gray-900 dark:text-white outline-none" />
+                          <input type="text" required minLength="3" placeholder="CVC" className="flex-1 bg-white dark:bg-black/50 border border-gray-200 dark:border-white/10 rounded-lg py-2 px-3 text-gray-900 dark:text-white outline-none" />
                         </div>
                       </div>
                       <button 
-                        onClick={processPayment}
+                        type="submit"
                         disabled={isProcessingPayment}
                         className="w-full py-4 bg-neon-purple hover:bg-neon-purple/90 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
                       >
                         {isProcessingPayment ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay ₹999'}
                       </button>
-                    </div>
+                    </form>
                   ) : (
                     <div className="text-center">
                       <div className="w-20 h-20 bg-neon-cyan/20 text-neon-cyan rounded-full flex items-center justify-center mx-auto mb-6">
